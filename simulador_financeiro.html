@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Financeiro - Acesso</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        /* TELA DE ACESSO */
+        .tela-acesso {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .tela-acesso.hidden { display: none; }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .logo p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.2);
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1.05em;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .error-msg {
+            color: #d32f2f;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+        .error-msg.show { display: block; }
+
+        .success-msg {
+            color: #11998e;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+            font-weight: bold;
+        }
+        .success-msg.show { display: block; }
+
+        .info-text {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            color: #1565c0;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        /* TELA PLATAFORMA */
+        .tela-plataforma {
+            display: none;
+        }
+        .tela-plataforma.active {
+            display: block;
+        }
+
+        header {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        h1 { color: #667eea; margin-bottom: 10px; }
+        .subtitle { color: #666; margin-bottom: 20px; }
+
+        .user-info {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .user-info span {
+            color: #666;
+            font-size: 0.95em;
+        }
+        .btn-sair {
+            background: #f5576c;
+            padding: 8px 15px;
+            width: auto;
+            margin-top: 0;
+            font-size: 0.9em;
+        }
+        .btn-sair:hover {
+            background: #d84050;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .metric {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background: #f0f0f0;
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #667eea;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:hover { background: #f9f9f9; }
+        .hidden { display: none; }
+        .ativo-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: flex-end;
+        }
+        .btn-small {
+            width: auto;
+            padding: 8px 15px;
+            font-size: 0.9em;
+        }
+        .btn-add { background: #11998e; }
+        .btn-remove { background: #f5576c; }
+        .ativo-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .ativo-card.best {
+            border-left-color: #11998e;
+            background: #f0fdf4;
+            box-shadow: 0 3px 10px rgba(17, 153, 142, 0.3);
+        }
+        .best-option {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .info-box {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <!-- TELA DE ACESSO -->
+    <div class="tela-acesso" id="telaAcesso">
+        <div class="logo">
+            <h1>💰 Simulador Financeiro</h1>
+            <p>Seu parceiro em análise de investimentos</p>
+        </div>
+
+        <div class="info-text">
+            Para acessar a plataforma de simulação de investimentos, preencha seus dados abaixo. Seus dados serão registrados automaticamente.
+        </div>
+
+        <form onsubmit="acessarPlataforma(event)">
+            <div class="form-group">
+                <label>📧 E-mail *</label>
+                <input type="email" id="email" placeholder="seu@email.com" required>
+                <div class="error-msg" id="errorEmail"></div>
+            </div>
+
+            <div class="form-group">
+                <label>👤 Nome Completo *</label>
+                <input type="text" id="nome" placeholder="Seu Nome" required>
+                <div class="error-msg" id="errorNome"></div>
+            </div>
+
+            <div class="form-group">
+                <label>📱 Telefone *</label>
+                <input type="tel" id="telefone" placeholder="(11) 99999-9999" required>
+                <div class="error-msg" id="errorTelefone"></div>
+            </div>
+
+            <div class="form-group">
+                <label>💼 Você já é investidor? *</label>
+                <select id="investidor" required>
+                    <option value="">Selecione uma opção</option>
+                    <option value="Sim, já invisto">Sim, já invisto</option>
+                    <option value="Não, estou começando">Não, estou começando</option>
+                    <option value="Estou planejando começar">Estou planejando começar</option>
+                </select>
+                <div class="error-msg" id="errorInvestidor"></div>
+            </div>
+
+            <button type="submit" id="btnAcesso">🚀 ACESSAR PLATAFORMA</button>
+            <div class="success-msg" id="msgSucesso">✅ Enviando dados...</div>
+        </form>
+    </div>
+
+    <!-- TELA PLATAFORMA -->
+    <div class="tela-plataforma" id="telaPlataforma">
+        <div class="container">
+            <header>
+                <h1>💰 Simulador Financeiro</h1>
+                <p class="subtitle">Compare investimentos e veja o melhor retorno</p>
+
+                <div class="user-info">
+                    <span>👤 <strong id="nomeUsuario"></strong> | 📧 <span id="emailUsuario"></span></span>
+                    <button class="btn-sair" onclick="sairPlataforma()">🚪 Sair</button>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="mostrarAba(0)">📈 Simulador</button>
+                    <button class="tab-btn" onclick="mostrarAba(1)">⚖️ Comparador</button>
+                </div>
+            </header>
+
+            <!-- ABA 1: SIMULADOR -->
+            <div class="tab-content active" id="aba-0">
+                <div class="card">
+                    <h2>Simulador de Rentabilidade</h2>
+                    <p style="color: #666; margin: 10px 0 20px 0;">Simule seu investimento comparado ao CDI</p>
+
+                    <div class="grid">
+                        <div class="form-group">
+                            <label>Tipo de Ativo</label>
+                            <select id="sim-tipo">
+                                <option value="CDB">CDB (com IR)</option>
+                                <option value="LCI">LCI (sem IR)</option>
+                                <option value="LCA">LCA (sem IR)</option>
+                                <option value="TESOURO">Tesouro (com IR)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Valor (R$)</label>
+                            <input type="number" id="sim-valor" value="10000" min="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Taxa (% a.a.)</label>
+                            <input type="number" id="sim-taxa" value="9.5" min="0" max="30" step="0.1">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Prazo (dias)</label>
+                            <input type="number" id="sim-prazo" value="365" min="30" step="30">
+                        </div>
+
+                        <div class="form-group">
+                            <label>CDI (% a.a.)</label>
+                            <input type="number" id="sim-cdi" value="10.65" min="0" max="30" step="0.1">
+                        </div>
+                    </div>
+
+                    <button onclick="executarSimulacao()">🚀 SIMULAR AGORA</button>
+
+                    <div id="sim-resultado" class="hidden" style="margin-top: 30px;">
+                        <h3>📊 Resultado</h3>
+
+                        <div class="grid">
+                            <div class="metric">
+                                <div class="metric-label">Valor BRUTO</div>
+                                <div class="metric-value" id="res-bruto">R$ 10.950</div>
+                                <div class="metric-label" id="res-bruto-pct">9.50%</div>
+                            </div>
+
+                            <div class="metric">
+                                <div class="metric-label">Valor LÍQUIDO</div>
+                                <div class="metric-value" id="res-liquido">R$ 10.800</div>
+                                <div class="metric-label" id="res-liquido-pct">8.00%</div>
+                            </div>
+
+                            <div class="metric" style="background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);">
+                                <div class="metric-label">IR</div>
+                                <div class="metric-value" id="res-ir">R$ 150</div>
+                                <div class="metric-label" id="res-ir-pct">15%</div>
+                            </div>
+
+                            <div class="metric" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                                <div class="metric-label">Superou CDI</div>
+                                <div class="metric-value" id="res-supera">+1.50%</div>
+                                <div class="metric-label">Diferença</div>
+                            </div>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Métrica</th>
+                                    <th>Seu Ativo</th>
+                                    <th>CDI</th>
+                                    <th>Diferença</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Valor Final Bruto</strong></td>
+                                    <td id="tab-bruto-seu">R$ 10.950</td>
+                                    <td id="tab-bruto-cdi">R$ 10.765</td>
+                                    <td style="color: #11998e; font-weight: bold;" id="tab-bruto-diff">+R$ 185</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Valor Final Líquido</strong></td>
+                                    <td id="tab-liquido-seu">R$ 10.800</td>
+                                    <td id="tab-liquido-cdi">R$ 10.650</td>
+                                    <td style="color: #11998e; font-weight: bold;" id="tab-liquido-diff">+R$ 150</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Rentabilidade Líquida (%)</strong></td>
+                                    <td style="font-weight: bold; color: #667eea;" id="tab-rent-seu">8.00%</td>
+                                    <td style="color: #999;" id="tab-rent-cdi">6.50%</td>
+                                    <td style="color: #11998e; font-weight: bold;" id="tab-rent-diff">+1.50%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="info-box">
+                            ℹ️ Ativos sem IR (LCI, LCA) não sofrem desconto. Ativos com IR descontam automaticamente conforme o prazo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA 2: COMPARADOR -->
+            <div class="tab-content hidden" id="aba-1">
+                <div class="card">
+                    <h2>Comparador Multi-Ativos</h2>
+                    <p style="color: #666; margin: 10px 0 20px 0;">Adicione seus ativos e veja qual é a melhor opção</p>
+
+                    <div class="grid">
+                        <div class="form-group">
+                            <label>Valor (R$)</label>
+                            <input type="number" id="comp-valor" value="10000" min="100">
+                        </div>
+                        <div class="form-group">
+                            <label>Prazo (dias)</label>
+                            <input type="number" id="comp-prazo" value="365" min="30" step="30">
+                        </div>
+                        <div class="form-group">
+                            <label>CDI (% a.a.)</label>
+                            <input type="number" id="comp-cdi" value="10.65" min="0" max="30" step="0.1">
+                        </div>
+                    </div>
+
+                    <h3>Seus Ativos (mínimo 2)</h3>
+                    <div id="comp-ativos-container"></div>
+
+                    <div style="margin: 10px 0;">
+                        <button class="btn-add btn-small" onclick="adicionarAtivoComp()">➕ Adicionar Ativo</button>
+                    </div>
+
+                    <button onclick="executarComparacao()">🔄 COMPARAR AGORA</button>
+
+                    <div id="comp-resultado" class="hidden" style="margin-top: 30px;">
+                        <div class="best-option">
+                            <h3>🏆 MELHOR OPÇÃO</h3>
+                            <div id="comp-melhor"></div>
+                        </div>
+
+                        <h3>Ranking de Ativos</h3>
+                        <div id="comp-cards"></div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Posição</th>
+                                    <th>Ativo</th>
+                                    <th>Taxa</th>
+                                    <th>Bruto</th>
+                                    <th>Líquido</th>
+                                    <th>Rentab. Líq.</th>
+                                    <th>vs CDI</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comp-tabela"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== INTEGRAÇÃO GOOGLE SHEETS =====
+        const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyatJ0povrdIyaRf_oIqUDI2I1v5OTN8iDxtwV6HU5fmwbwnUgGYJTzSM9IFfxbSpBDUw/exec";
+
+        function acessarPlataforma(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const nome = document.getElementById('nome').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
+            const investidor = document.getElementById('investidor').value;
+
+            let temErro = false;
+
+            if (!email) {
+                mostrarErro('errorEmail', 'E-mail é obrigatório');
+                temErro = true;
+            }
+            if (!nome || nome.split(' ').length < 2) {
+                mostrarErro('errorNome', 'Digite seu nome completo');
+                temErro = true;
+            }
+            if (!telefone || telefone.replace(/\D/g, '').length < 10) {
+                mostrarErro('errorTelefone', 'Digite um telefone válido');
+                temErro = true;
+            }
+            if (!investidor) {
+                mostrarErro('errorInvestidor', 'Selecione uma opção');
+                temErro = true;
+            }
+
+            if (temErro) return;
+
+            // Mostrar carregamento
+            const btn = document.getElementById('btnAcesso');
+            const msg = document.getElementById('msgSucesso');
+            btn.disabled = true;
+            msg.classList.add('show');
+
+            // Enviar para Google Sheet
+            const params = new URLSearchParams();
+            params.append('name', nome);
+            params.append('email', email);
+            params.append('phone', telefone);
+            params.append('investor', investidor);
+
+            fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: params,
+                mode: 'no-cors'
+            })
+            .then(() => {
+                // Salvar dados localmente também
+                const dados = { email, nome, telefone, investidor, data: new Date().toLocaleString('pt-BR') };
+                localStorage.setItem('usuarioPlataforma', JSON.stringify(dados));
+
+                // Abrir plataforma após 1 segundo
+                setTimeout(() => {
+                    document.getElementById('telaAcesso').classList.add('hidden');
+                    document.getElementById('telaPlataforma').classList.add('active');
+                    document.getElementById('nomeUsuario').textContent = nome.split(' ')[0];
+                    document.getElementById('emailUsuario').textContent = email;
+                    inicializarComparador();
+                }, 1000);
+            })
+            .catch(err => {
+                console.error('Erro ao enviar:', err);
+                // Mesmo com erro, permitir acesso
+                document.getElementById('telaAcesso').classList.add('hidden');
+                document.getElementById('telaPlataforma').classList.add('active');
+                document.getElementById('nomeUsuario').textContent = nome.split(' ')[0];
+                document.getElementById('emailUsuario').textContent = email;
+                inicializarComparador();
+            });
+        }
+
+        function mostrarErro(elementId, mensagem) {
+            const elem = document.getElementById(elementId);
+            elem.textContent = mensagem;
+            elem.classList.add('show');
+        }
+
+        function limparErro(elementId) {
+            const elem = document.getElementById(elementId);
+            elem.textContent = '';
+            elem.classList.remove('show');
+        }
+
+        document.querySelectorAll('input, select').forEach(elem => {
+            elem.addEventListener('focus', function() {
+                const errorId = 'error' + this.id.charAt(0).toUpperCase() + this.id.slice(1);
+                if (document.getElementById(errorId)) {
+                    limparErro(errorId);
+                }
+            });
+        });
+
+        function sairPlataforma() {
+            if (confirm('Deseja sair da plataforma?')) {
+                localStorage.removeItem('usuarioPlataforma');
+                location.reload();
+            }
+        }
+
+        // ===== FUNÇÕES DE CÁLCULO =====
+        function calcularAliquotaIR(dias) {
+            const meses = dias / 30;
+            if (meses <= 6) return 0.225;
+            if (meses <= 12) return 0.20;
+            if (meses <= 24) return 0.175;
+            return 0.15;
+        }
+
+        function calcularJurosCompostos(valor, taxa, dias) {
+            const taxaDiaria = Math.pow(1 + taxa, 1 / 365) - 1;
+            return valor * Math.pow(1 + taxaDiaria, dias);
+        }
+
+        function formatarMoeda(v) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+        }
+
+        function formatarPercent(v) {
+            return (v).toFixed(2) + '%';
+        }
+
+        // ===== SIMULADOR =====
+        function executarSimulacao() {
+            try {
+                const valor = parseFloat(document.getElementById('sim-valor').value);
+                const taxa = parseFloat(document.getElementById('sim-taxa').value) / 100;
+                const prazo = parseInt(document.getElementById('sim-prazo').value);
+                const cdi = parseFloat(document.getElementById('sim-cdi').value) / 100;
+                const tipo = document.getElementById('sim-tipo').value;
+
+                const isento = tipo === 'LCI' || tipo === 'LCA';
+
+                const vfBruto = calcularJurosCompostos(valor, taxa, prazo);
+                const ganhoBruto = vfBruto - valor;
+                let ir = 0, aliquota = 0;
+
+                if (!isento) {
+                    aliquota = calcularAliquotaIR(prazo);
+                    ir = ganhoBruto * aliquota;
+                }
+
+                const vfLiquido = vfBruto - ir;
+                const ganhoLiquido = vfLiquido - valor;
+                const rentBruta = (ganhoBruto / valor) * 100;
+                const rentLiquida = (ganhoLiquido / valor) * 100;
+
+                const vfCdiBruto = calcularJurosCompostos(valor, cdi, prazo);
+                const ganhoCdiBruto = vfCdiBruto - valor;
+                const aliquotaCdi = calcularAliquotaIR(prazo);
+                const irCdi = ganhoCdiBruto * aliquotaCdi;
+                const vfCdiLiquido = vfCdiBruto - irCdi;
+                const rentCdiLiquida = ((vfCdiLiquido - valor) / valor) * 100;
+
+                document.getElementById('res-bruto').textContent = formatarMoeda(vfBruto);
+                document.getElementById('res-bruto-pct').textContent = formatarPercent(rentBruta);
+                document.getElementById('res-liquido').textContent = formatarMoeda(vfLiquido);
+                document.getElementById('res-liquido-pct').textContent = formatarPercent(rentLiquida);
+                document.getElementById('res-ir').textContent = formatarMoeda(ir);
+                document.getElementById('res-ir-pct').textContent = isento ? 'Isento' : formatarPercent(aliquota * 100);
+                document.getElementById('res-supera').textContent = '+' + formatarPercent(rentLiquida - rentCdiLiquida);
+
+                document.getElementById('tab-bruto-seu').textContent = formatarMoeda(vfBruto);
+                document.getElementById('tab-bruto-cdi').textContent = formatarMoeda(vfCdiBruto);
+                document.getElementById('tab-bruto-diff').textContent = '+' + formatarMoeda(vfBruto - vfCdiBruto);
+                document.getElementById('tab-liquido-seu').textContent = formatarMoeda(vfLiquido);
+                document.getElementById('tab-liquido-cdi').textContent = formatarMoeda(vfCdiLiquido);
+                document.getElementById('tab-liquido-diff').textContent = '+' + formatarMoeda(vfLiquido - vfCdiLiquido);
+                document.getElementById('tab-rent-seu').textContent = formatarPercent(rentLiquida);
+                document.getElementById('tab-rent-cdi').textContent = formatarPercent(rentCdiLiquida);
+                document.getElementById('tab-rent-diff').textContent = '+' + formatarPercent(rentLiquida - rentCdiLiquida);
+
+                document.getElementById('sim-resultado').classList.remove('hidden');
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+
+        // ===== COMPARADOR =====
+        let ativos = [
+            { nome: 'CDB', taxa: 9.5, isento: false },
+            { nome: 'LCI', taxa: 8.5, isento: true }
+        ];
+
+        function mostrarAba(n) {
+            let tabs = document.querySelectorAll('.tab-content');
+            let btns = document.querySelectorAll('.tab-btn');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.add('hidden');
+                tabs[i].classList.remove('active');
+                btns[i].classList.remove('active');
+            }
+            document.getElementById('aba-' + n).classList.remove('hidden');
+            document.getElementById('aba-' + n).classList.add('active');
+            btns[n].classList.add('active');
+            if (n === 1) inicializarComparador();
+        }
+
+        function inicializarComparador() {
+            renderizarAtivos();
+        }
+
+        function renderizarAtivos() {
+            let html = '';
+            ativos.forEach((a, i) => {
+                html += `
+                    <div class="ativo-row">
+                        <input type="text" value="${a.nome}" onchange="atualizarAtivo(${i}, 'nome', this.value)">
+                        <input type="number" value="${a.taxa}" min="0" max="30" step="0.1" onchange="atualizarAtivo(${i}, 'taxa', this.value)">
+                        <select onchange="atualizarAtivo(${i}, 'isento', this.value === 'true')">
+                            <option value="false" ${!a.isento ? 'selected' : ''}>Com IR</option>
+                            <option value="true" ${a.isento ? 'selected' : ''}>Sem IR</option>
+                        </select>
+                        ${ativos.length > 2 ? `<button class="btn-remove btn-small" onclick="removerAtivo(${i})">❌</button>` : ''}
+                    </div>
+                `;
+            });
+            document.getElementById('comp-ativos-container').innerHTML = html;
+        }
+
+        function atualizarAtivo(i, campo, valor) {
+            if (campo === 'taxa') ativos[i].taxa = parseFloat(valor);
+            else if (campo === 'isento') ativos[i].isento = valor === true || valor === 'true';
+            else if (campo === 'nome') ativos[i].nome = valor;
+        }
+
+        function adicionarAtivoComp() {
+            if (ativos.length < 5) {
+                ativos.push({ nome: `Ativo ${ativos.length + 1}`, taxa: 9.5, isento: false });
+                renderizarAtivos();
+            }
+        }
+
+        function removerAtivo(i) {
+            if (ativos.length > 2) {
+                ativos.splice(i, 1);
+                renderizarAtivos();
+            }
+        }
+
+        function executarComparacao() {
+            try {
+                if (ativos.length < 2) {
+                    alert('Adicione pelo menos 2 ativos!');
+                    return;
+                }
+
+                const valor = parseFloat(document.getElementById('comp-valor').value);
+                const prazo = parseInt(document.getElementById('comp-prazo').value);
+                const cdi = parseFloat(document.getElementById('comp-cdi').value) / 100;
+
+                const vfCdiBruto = calcularJurosCompostos(valor, cdi, prazo);
+                const irCdi = (vfCdiBruto - valor) * calcularAliquotaIR(prazo);
+                const vfCdiLiquido = vfCdiBruto - irCdi;
+                const rentCdiLiq = ((vfCdiLiquido - valor) / valor) * 100;
+
+                const resultados = ativos.map(a => {
+                    const taxa = a.taxa / 100;
+                    const vf = calcularJurosCompostos(valor, taxa, prazo);
+                    const ganho = vf - valor;
+                    let ir = 0;
+                    if (!a.isento) ir = ganho * calcularAliquotaIR(prazo);
+                    const vl = vf - ir;
+                    const rentLiq = ((vl - valor) / valor) * 100;
+                    return { nome: a.nome, taxa: a.taxa, isento: a.isento, vf, vl, ir, rentLiq, supera: rentLiq - rentCdiLiq };
+                }).sort((a, b) => b.rentLiq - a.rentLiq);
+
+                const melhor = resultados[0];
+                document.getElementById('comp-melhor').innerHTML = `
+                    <div style="font-size: 1.2em; font-weight: bold;">${melhor.nome}</div>
+                    <div>Rentabilidade: <strong>${formatarPercent(melhor.rentLiq)}</strong></div>
+                    <div>Valor Final: <strong>${formatarMoeda(melhor.vl)}</strong></div>
+                `;
+
+                let cardsHtml = '';
+                resultados.forEach((r, i) => {
+                    cardsHtml += `
+                        <div class="ativo-card ${i === 0 ? 'best' : ''}">
+                            <div style="font-weight: bold; margin-bottom: 10px;">${i + 1}º - ${r.nome} ${i === 0 ? '🏆' : ''}</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em;">
+                                <div>Taxa: <strong>${formatarPercent(r.taxa)}</strong></div>
+                                <div>Bruto: <strong>${formatarMoeda(r.vf)}</strong></div>
+                                <div>Líquido: <strong>${formatarMoeda(r.vl)}</strong></div>
+                                <div>Rentab.: <strong style="color: #667eea;">${formatarPercent(r.rentLiq)}</strong></div>
+                            </div>
+                        </div>
+                    `;
+                });
+                document.getElementById('comp-cards').innerHTML = cardsHtml;
+
+                let tabelaHtml = '';
+                resultados.forEach((r, i) => {
+                    tabelaHtml += `
+                        <tr ${i === 0 ? 'style="background: #f0fdf4;"' : ''}>
+                            <td><strong>${i + 1}º</strong></td>
+                            <td>${r.nome}</td>
+                            <td>${formatarPercent(r.taxa)}</td>
+                            <td>${formatarMoeda(r.vf)}</td>
+                            <td>${formatarMoeda(r.vl)}</td>
+                            <td style="color: #667eea; font-weight: bold;">${formatarPercent(r.rentLiq)}</td>
+                            <td style="color: #11998e; font-weight: bold;">+${formatarPercent(r.supera)}</td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('comp-tabela').innerHTML = tabelaHtml;
+
+                document.getElementById('comp-resultado').classList.remove('hidden');
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+    </script>
+</body>
+</html>
