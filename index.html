@@ -874,10 +874,35 @@
 
                 document.getElementById('sim-resultado').classList.remove('hidden');
 
+                // Enviar dados da simulação para Google Sheets
+                enviarDadosSimulacao(valor, 'Simulador');
+
                 // Incrementar contador de simulações
                 numSimulacoes++;
             } catch (e) {
                 alert('Erro: ' + e.message);
+            }
+        }
+
+        // ===== FUNÇÃO PARA ENVIAR SIMULAÇÕES =====
+        function enviarDadosSimulacao(valor, tipo) {
+            try {
+                const usuario = JSON.parse(localStorage.getItem('usuarioPlataforma'));
+                if (!usuario || !usuario.email) return;
+
+                const params = new URLSearchParams();
+                params.append('tipo', 'simulacao');
+                params.append('email', usuario.email);
+                params.append('tipoSimulacao', tipo);
+                params.append('valor', 'R$ ' + valor.toFixed(2));
+
+                fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: params,
+                    mode: 'no-cors'
+                }).catch(err => console.log('Simulação registrada'));
+            } catch (e) {
+                console.log('Erro ao registrar simulação:', e);
             }
         }
 
@@ -1025,6 +1050,9 @@
                 document.getElementById('comp-tabela').innerHTML = tabelaHtml;
 
                 document.getElementById('comp-resultado').classList.remove('hidden');
+
+                // Enviar dados da comparação para Google Sheets
+                enviarDadosSimulacao(valor, 'Comparador');
 
                 // Incrementar contador de simulações
                 numSimulacoes++;
